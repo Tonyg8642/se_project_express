@@ -1,4 +1,9 @@
 const User = require("../models/user");
+const {
+  INTERNAL_SERVER_ERROR_CODE,
+  BAD_REQUEST_ERROR_CODE,
+  NOT_FOUND_ERROR_CODE,
+} = require("../utils/errors");
 
 //get users
 const getUsers = (req, res) => {
@@ -9,7 +14,9 @@ const getUsers = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send({ message: "Server error while fetching users" });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while fetching users" });
     });
 };
 
@@ -25,9 +32,13 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Invalid user data" });
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid user data" });
       }
-      res.status(500).send({ message: "Server error while fetching users" });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while fetching users" });
     });
 };
 
@@ -36,13 +47,17 @@ const getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "User not found" });
       }
       res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send({ message: "Server error while fetching user" });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while fetching user" });
     });
 };
 

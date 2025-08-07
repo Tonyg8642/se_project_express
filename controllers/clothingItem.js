@@ -1,5 +1,6 @@
 const clothingItem = require("../models/clothingItem");
 const ClothingItem = require("../models/clothingItem");
+const { INTERNAL_SERVER_ERROR_CODE } = require("../utils/errors");
 
 //main handler of all of my api calls. Line 5
 //console.log(req.body) is when we work with a post. The "body" contains the majority of the data
@@ -18,7 +19,9 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      res.status(500).send({ message: "Error from createItem", e });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Error from createItem", e });
     });
 };
 
@@ -28,7 +31,9 @@ const getItems = (req, res) => {
     .find({})
     .then((items) => res.status(200).send(items))
     .catch((e) => {
-      res.status(500).send({ message: "Error from getItems", e });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Error from getItems", e });
     });
 };
 
@@ -43,7 +48,9 @@ const updateItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((e) => {
-      res.status(500).send({ message: "Error from updateItem", e });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Error from updateItem", e });
     });
 };
 
@@ -59,7 +66,9 @@ const deleteItem = (req, res) => {
       res.status(204).send({ message: "Item deleted successfully" });
     })
     .catch((e) => {
-      res.status(500).send({ message: "Error from deleteItem", e });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Error from deleteItem", e });
     });
 };
 
