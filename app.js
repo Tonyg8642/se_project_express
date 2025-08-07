@@ -34,7 +34,7 @@ app.use('/api', routes);
 app.use("/", userRouter);
 
 app.get("/", (req, res) => {
-  res.send("Sending response: Server is running on port 3001!");
+  res.send({message:"Sending response: Server is running on port 3001!"});
 });
 
 app.listen(PORT, () => {
