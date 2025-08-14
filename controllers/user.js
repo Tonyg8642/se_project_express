@@ -5,7 +5,7 @@ const {
   NOT_FOUND_ERROR_CODE,
 } = require("../utils/errors");
 
-//get users
+// get users
 const getUsers = (req, res) => {
   console.log("here");
   User.find({})
@@ -20,7 +20,7 @@ const getUsers = (req, res) => {
     });
 };
 
-//creating a user
+// creating a user
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
@@ -43,6 +43,7 @@ const createUser = (req, res) => {
 };
 
 const getUserById = (req, res) => {
+  console.log("userId:", req.params.id);
   const userId = req.params.id;
   User.findById(userId)
     .then((user) => {
@@ -55,6 +56,11 @@ const getUserById = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid user ID" });
+      }
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while fetching user" });

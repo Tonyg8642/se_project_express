@@ -1,12 +1,13 @@
 const express = require("express");
-const userRouter = require("./routes/users.js");
 const mongoose = require("mongoose");
+const userRouter = require("./routes/users.js");
+
 const app = express();
 const PORT = 3001;
 
 app.use(express.json());
 
-//next calls the next middleware in the chain
+// next calls the next middleware in the chain
 app.use((req, res, next) => {
   req.user = {
     _id: "6893776e2abcc4a55ced18f4",
@@ -28,10 +29,10 @@ mongoose
 const e = require("express");
 
 app.use(express.json());
-app.use('/api', routes);
+app.use('/', routes);
 
 
-app.use("/", userRouter);
+
 
 app.get("/", (req, res) => {
   res.send({message:"Sending response: Server is running on port 3001!"});
