@@ -1,5 +1,5 @@
 const clothingItem = require("../models/clothingItem");
-const ClothingItem = require("../models/clothingItem");
+
 const {
   INTERNAL_SERVER_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
@@ -12,9 +12,10 @@ const { BAD_REQUEST_ERROR_CODE } = require("../utils/errors");
 // next, ClothingItem.create({name, wealther, imageURL}) is apart of the express
 // ClothingItem.create({name, wealther, imageURL}) is a promise so use .then and return ((item))
 const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl })
+  const { name, weather, imageURL } = req.body;
+
+  ClothingItem.create({ name, weather, imageURL, owner : req.user._id })
     .then((item) => {
       res.send({ data: item });
     })

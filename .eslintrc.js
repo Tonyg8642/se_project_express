@@ -1,27 +1,26 @@
 module.exports = {
-    env: {
-      es2021: true,
-      node: true,
-    },
-    
-    // Add the necessary extensions.
-    extends: ["eslint:recommended", "airbnb-base", "prettier"],
-    overrides: [
-      {
-        env: {
-          node: true,
-        },
-        files: [".eslintrc.{js,cjs}"],
-        parserOptions: {
-          sourceType: "script",
-        },
+  env: {
+    es2021: true,
+    node: true,
+  },
+
+  extends: ["eslint:recommended", "airbnb-base", "prettier"],
+  overrides: [
+    {
+      env: {
+        node: true,
       },
-    ],
-    parserOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      files: [".eslintrc.{js,cjs}"],
+      parserOptions: {
+        sourceType: "script",
+      },
     },
-    rules: {
-      "no-underscore-dangle": "off",
-    }
-  };
+  ],
+  parserOptions: {
+    ecmaVersion: "latest",
+    sourceType: "module",
+  },
+  rules: {
+    "no-underscore-dangle": "off",
+  },
+};

@@ -11,7 +11,6 @@ app.use(express.json());
 app.use((req, res, next) => {
   req.user = {
     _id: "6893776e2abcc4a55ced18f4",
-
   };
   next();
 });
@@ -25,17 +24,12 @@ mongoose
     console.error("Error connecting to MongoDB:", err);
   });
 
-  const routes = require('./routes');
 const e = require("express");
 
-app.use(express.json());
-app.use('/', routes);
-
-
-
+app.use("/", routes);
 
 app.get("/", (req, res) => {
-  res.send({message:"Sending response: Server is running on port 3001!"});
+  res.send({ message: "Sending response: Server is running on port 3001!" });
 });
 
 app.listen(PORT, () => {
