@@ -20,12 +20,12 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((e) => {
+      console.error(e);
       if (e.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid user ID" });
       }
-      console.error(e);
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Error from createItem", e });
@@ -75,6 +75,7 @@ const deleteItem = (req, res) => {
       res.status(200).send({ message: "Item deleted successfully" });
     })
     .catch((e) => {
+      console.error(e);
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -85,7 +86,6 @@ const deleteItem = (req, res) => {
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-      console.error(e);
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Error from deleteItem", e });
