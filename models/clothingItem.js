@@ -24,20 +24,20 @@ const clothingItemSchema = new mongoose.Schema({
       validator: (v) => validator.isURL(v),
       message: "Link is not",
     },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',        // reference to User model
-      required: true      // ensures every item is associated with a user
-    },
-    likes: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'User',        // references users who liked the item
-      default: []         // starts as an empty array
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now   // automatically sets creation timestamp
-    },
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',        // reference to User model
+    required: true      // ensures every item is associated with a user
+  },
+  likes: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',        // references users who liked the item
+    default: []         // starts as an empty array
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now   // automatically sets creation timestamp
   },
 });
 

@@ -1,4 +1,4 @@
-const clothingItem = require("../models/clothingItem");
+const ClothingItem = require("../models/ClothingItem");
 
 const {
   INTERNAL_SERVER_ERROR_CODE,
@@ -32,9 +32,9 @@ const createItem = (req, res) => {
     });
 };
 
-// This function connects to the "Read" route in clothingItem.js
+// This function connects to the "Read" route in ClothingItem.js
 const getItems = (req, res) => {
-  clothingItem
+  ClothingItem
     .find({})
     .then((items) => res.status(200).send(items))
     .catch((e) => {
@@ -49,7 +49,7 @@ const updateItem = (req, res) => {
   const { itemId } = req.params;
   const { imageURL } = req.body;
 
-  clothingItem
+  ClothingItem
     .findByIdAndUpdate(itemId, { $set: { imageURL } })
     .orFail()
     .then((item) => {
@@ -68,7 +68,7 @@ const deleteItem = (req, res) => {
 
   console.log(itemId);
 
-  clothingItem
+  ClothingItem
     .findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
@@ -96,7 +96,7 @@ const likeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  clothingItem
+  ClothingItem
     .findByIdAndUpdate(itemId, { $addToSet: { likes: userId } }, { new: true })
     .orFail()
     .then((item) => {
@@ -124,7 +124,7 @@ const unlikeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  clothingItem
+  ClothingItem
     .findByIdAndUpdate(itemId, { $pull: { likes: userId } }, { new: true })
     .orFail()
     .then((item) => {
