@@ -11,34 +11,30 @@ const clothingItemSchema = new mongoose.Schema({
   weather: {
     type: String,
     required: true,
-    enum: ['hot', 'warm', 'cold']
-    //An enum validator is a rule that limits a field’s value to a specific list of allowed options.
-    //In this case, the weather field can only be 'hot', 'warm', or 'cold'.
-    //It’s like saying: “Choose only from this specific list.”
-
+    enum: ['hot', 'warm', 'cold'], // An enum validator limits values to a specific list
   },
-  imageURL: {
+  imageUrl: {
     type: String,
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: "Link is not",
+      message: "Link is not valid",
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',        // reference to User model
-    required: true      // ensures every item is associated with a user
+    ref: "User", // Reference to User model
+    required: true, // Ensures every item is associated with a user
   },
   likes: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'User',        // references users who liked the item
-    default: []         // starts as an empty array
+    ref: "User", // References users who liked the item
+    default: [], // Starts as an empty array
   },
   createdAt: {
     type: Date,
-    default: Date.now   // automatically sets creation timestamp
+    default: Date.now, // Automatically sets creation timestamp
   },
 });
 
-module.exports = mongoose.model("clothingItems", clothingItemSchema);
+module.exports = mongoose.model("ClothingItem", clothingItemSchema);

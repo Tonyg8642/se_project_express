@@ -1,13 +1,16 @@
-const router = require("express").Router();
+const express = require("express");
+
+const router = express.Router();
 const clothingItem = require("./clothingItem");
-const { INTERNAL_SERVER_ERROR_CODE } = require("../utils/errors");
 const user = require("./users");
 
+// Mount routers
 router.use("/items", clothingItem);
 router.use("/users", user);
 
+// Handle unknown routes
 router.use((req, res) => {
-  res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: "Not Found" });
+  res.status(404).send({ message: "Not Found" });
 });
 
 module.exports = router;

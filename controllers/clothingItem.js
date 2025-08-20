@@ -1,81 +1,69 @@
-const ClothingItem = require("../models/ClothingItem");
+const ClothingItem = require("../models/clothingItem");
+
 
 const {
   INTERNAL_SERVER_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  BAD_REQUEST_ERROR_CODE,
 } = require("../utils/errors");
-const { BAD_REQUEST_ERROR_CODE } = require("../utils/errors");
 
-// main handler of all of my api calls. Line 5
-// console.log(req.body) is when we work with a post. The "body" contains the majority of the data
-// next, we extract the data out of the body on line 10. Start with const then the date in {}
-// next, ClothingItem.create({name, wealther, imageURL}) is apart of the express
-// ClothingItem.create({name, wealther, imageURL}) is a promise so use .then and return ((item))
+// Main handler of all API calls
 const createItem = (req, res) => {
+  const { name, weather, imageUrl } = req.body;
 
-  const { name, weather, imageURL } = req.body;
-
-  ClothingItem.create({ name, weather, imageURL, owner : req.user._id })
-    .then((item) => {
-      res.send({ data: item });
-    })
+  return ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+    .then((item) => res.send({ data: item }))
     .catch((e) => {
-      console.error(e);
+      console.error(e); // eslint-disable-line no-console
       if (e.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid user ID" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from createItem", e });
+        .send({ message: "Error from createItem" });
     });
 };
 
-// This function connects to the "Read" route in ClothingItem.js
-const getItems = (req, res) => {
-  ClothingItem
-    .find({})
-    .then((items) => res.status(200).send(items))
+// Get all clothing items
+const getItems = (req, res) =>
+  ClothingItem.find({})
+    .then((items) => res.send(items))
     .catch((e) => {
-      console.error(e);
-      res
+      console.error(e); // eslint-disable-line no-console
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from getItems", e });
+        .send({ message: "Error from getItems" });
     });
-};
 
+// Update a clothing item
 const updateItem = (req, res) => {
   const { itemId } = req.params;
-  const { imageURL } = req.body;
+  const { imageUrl } = req.body;
 
-  ClothingItem
-    .findByIdAndUpdate(itemId, { $set: { imageURL } })
+  return ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } }, { new: true })
     .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
-      console.error(e);
-      res
+      console.error(e); // eslint-disable-line no-console
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Error from updateItem", e });
     });
 };
 
+// Delete a clothing item
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  console.log(itemId);
+  console.log(itemId); // eslint-disable-line no-console
 
-  ClothingItem
-    .findByIdAndDelete(itemId)
+  return ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => {
-      res.status(200).send({ message: "Item deleted successfully" });
-    })
+    .then(() => res.status(200).send({ message: "Item deleted successfully" }))
     .catch((e) => {
-      console.error(e);
+      console.error(e); // eslint-disable-line no-console
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -86,23 +74,26 @@ const deleteItem = (req, res) => {
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from deleteItem", e });
+        .send({ message: "Error from deleteItem" });
     });
 };
 
+// Like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  ClothingItem
-    .findByIdAndUpdate(itemId, { $addToSet: { likes: userId } }, { new: true })
+  return ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
     .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
+      console.error(e); // eslint-disable-line no-console
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -113,24 +104,26 @@ const likeItem = (req, res) => {
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-      console.error(e);
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from likeItem", e });
+        .send({ message: "Error from likeItem" });
     });
 };
 
+// Unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  ClothingItem
-    .findByIdAndUpdate(itemId, { $pull: { likes: userId } }, { new: true })
+  return ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
     .orFail()
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
+      console.error(e); // eslint-disable-line no-console
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -141,10 +134,9 @@ const unlikeItem = (req, res) => {
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-      console.error(e);
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from unlikeItem", e });
+        .send({ message: "Error from unlikeItem" });
     });
 };
 

@@ -5,63 +5,57 @@ const {
   NOT_FOUND_ERROR_CODE,
 } = require("../utils/errors");
 
-// get users
-const getUsers = (req, res) => {
-  console.log("here");
+// Get all users
+const getUsers = (req, res) =>
   User.find({})
-    .then((users) => {
-      res.status(200).send(users);
-    })
+    .then((users) => res.status(200).send(users))
     .catch((err) => {
-      console.error(err);
-      res
+      console.error(err); // eslint-disable-line no-console
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while fetching users" });
     });
-};
 
-// creating a user
-
+// Create a new user
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
-  User.create({ name, avatar })
-    .then((user) => {
-      res.status(201).send(user);
-    })
+  return User.create({ name, avatar })
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.error(err);
+      console.error(err); // eslint-disable-line no-console
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid user data" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Server error while fetching users" });
+        .send({ message: "Server error while creating user" });
     });
 };
 
+// Get a user by ID
 const getUserById = (req, res) => {
-  console.log("userId:", req.params.id);
   const userId = req.params.id;
-  User.findById(userId)
+
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "User not found" });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      console.error(err);
+      console.error(err); // eslint-disable-line no-console
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid user ID" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while fetching user" });
     });

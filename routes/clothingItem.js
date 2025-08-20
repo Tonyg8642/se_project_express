@@ -1,6 +1,4 @@
 const router = require("express").Router();
-
-// CRUD
 const {
   createItem,
   getItems,
@@ -10,22 +8,22 @@ const {
   unlikeItem,
 } = require("../controllers/clothingItem");
 
-// create
+// Create a new clothing item
 router.post("/", createItem);
 
-// Read
-
+// Get all clothing items
 router.get("/", getItems);
 
-// Update
+// Update a clothing item (optional if needed in future)
 router.put("/:itemId", updateItem);
 
-// Delete
+// Delete a clothing item
 router.delete("/:itemId", deleteItem);
 
-//item.id
+// Like a clothing item
 router.put("/:itemId/likes", likeItem);
 
+// Unlike a clothing item
 router.delete("/:itemId/likes", unlikeItem);
 
 module.exports = router;

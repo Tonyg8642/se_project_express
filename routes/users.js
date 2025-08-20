@@ -1,5 +1,5 @@
-const router = require('express').Router();
-const { getUsers, getUserById, createUser } = require('../controllers/user');
+const router = require("express").Router();
+const { getUsers, getUserById, createUser } = require("../controllers/user");
 
 // Route to get all users
 router.get("/", getUsers);
