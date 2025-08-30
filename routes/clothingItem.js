@@ -2,28 +2,24 @@ const router = require("express").Router();
 const {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   unlikeItem,
-} = require("../controllers/clothingItem");
+} = require("../controllers/clothingItems"); // make sure file name matches!
 
-// Create a new clothing item
-router.post("/", createItem);
-
-// Get all clothing items
+// GET /items → return all clothing items (public)
 router.get("/", getItems);
 
-// Update a clothing item (optional if needed in future)
-router.put("/:itemId", updateItem);
+// POST /items → create a new clothing item (protected)
+router.post("/", createItem);
 
-// Delete a clothing item
+// DELETE /items/:itemId → delete an item if current user is the owner
 router.delete("/:itemId", deleteItem);
 
-// Like a clothing item
+// PUT /items/:itemId/likes → like an item
 router.put("/:itemId/likes", likeItem);
 
-// Unlike a clothing item
+// DELETE /items/:itemId/likes → unlike an item
 router.delete("/:itemId/likes", unlikeItem);
 
 module.exports = router;

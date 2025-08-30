@@ -1,38 +1,44 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const routes = require("./routes"); // <-- import the centralized router
+const cors = require("cors");
+const routes = require("./routes");
 
 const app = express();
 const PORT = 3001;
 
-app.use(express.json());
+// Enable CORS
+app.use(cors());
 
-// Middleware to add a fake authenticated user
-app.use((req, res, next) => {
-  req.user = { _id: "6893776e2abcc4a55ced18f4" };
-  next();
-});
+// Parse JSON request bodies
+app.use(express.json());
 
 // Connect to MongoDB
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
-    console.log("Connected to MongoDB"); // eslint-disable-line no-console
+    console.log("Connected to MongoDB");
   })
   .catch((err) => {
-    console.error("Error connecting to MongoDB:", err); // eslint-disable-line no-console
+    console.error("Error connecting to MongoDB:", err);
   });
 
-// Mount main router
+// Mount centralized routes
 app.use("/", routes);
 
-// Root endpoint for testing
+// Health check endpoint
 app.get("/", (req, res) =>
   res.send({ message: "Server is running on port 3001!" })
 );
 
-// Start the server
-app.listen(
-  PORT,
-  () => console.log(`Server is listening on port ${PORT}`) // eslint-disable-line no-console
-);
+// Global error handler (good practice)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res
+    .status(500)
+    .send({ message: "An error has occurred on the server" });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});

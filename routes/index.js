@@ -1,16 +1,10 @@
-const express = require("express");
+const router = require("express").Router();
+const { getCurrentUser, updateUser } = require("../controllers/users");
 
-const router = express.Router();
-const clothingItem = require("./clothingItem");
-const user = require("./users");
+// Get current logged-in user
+router.get("/me", getCurrentUser);
 
-// Mount routers
-router.use("/items", clothingItem);
-router.use("/users", user);
-
-// Handle unknown routes
-router.use((req, res) => {
-  res.status(404).send({ message: "Not Found" });
-});
+// Update current user (name + avatar)
+router.patch("/me", updateUser);
 
 module.exports = router;
