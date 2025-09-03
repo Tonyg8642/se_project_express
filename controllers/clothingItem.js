@@ -72,7 +72,7 @@ const deleteItem = (req, res) => {
 
       if (item.owner.toString() !== currentUserId) {
         return res
-          .status(403)
+        .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "Forbidden: You cannot delete another user's item" });
       }
 

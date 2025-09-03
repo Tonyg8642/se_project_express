@@ -1,25 +1,20 @@
 const router = require("express").Router();
+const auth = require("../middlewares/auth");
 const {
   createItem,
   getItems,
   deleteItem,
   likeItem,
   unlikeItem,
-} = require("../controllers/clothingItems"); // make sure file name matches!
+} = require("../controllers/clothingItems");
 
-// GET /items → return all clothing items (public)
+// Public route
 router.get("/", getItems);
 
-// POST /items → create a new clothing item (protected)
-router.post("/", createItem);
-
-// DELETE /items/:itemId → delete an item if current user is the owner
-router.delete("/:itemId", deleteItem);
-
-// PUT /items/:itemId/likes → like an item
-router.put("/:itemId/likes", likeItem);
-
-// DELETE /items/:itemId/likes → unlike an item
-router.delete("/:itemId/likes", unlikeItem);
+// Protected routes
+router.post("/", auth, createItem);
+router.delete("/:itemId", auth, deleteItem);
+router.put("/:itemId/likes", auth, likeItem);
+router.delete("/:itemId/likes", auth, unlikeItem);
 
 module.exports = router;
