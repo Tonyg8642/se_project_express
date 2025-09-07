@@ -4,6 +4,7 @@ const { login, createUser } = require("../controllers/user");
 const clothingItemRoutes = require("./clothingItem");
 const userRoutes = require("./users");
 const auth = require("../middlewares/auth");
+const { NOT_FOUND_ERROR_CODE } = require("../utils/errors"); // ✅ import constant
 
 // Public routes
 router.post("/signin", login);
@@ -18,7 +19,7 @@ router.use("/items", clothingItemRoutes);
 
 // Handle unknown routes
 router.use((req, res) => {
-  res.status(404).send({ message: "Not Found" });
+  res.status(NOT_FOUND_ERROR_CODE).send({ message: "Not Found" });
 });
 
 module.exports = router;

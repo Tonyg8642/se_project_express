@@ -25,12 +25,18 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.code === 11000) {
-        return res.status(CONFLICT_ERROR_CODE).send({ message: "Email already exists" });
+        return res
+          .status(CONFLICT_ERROR_CODE)
+          .send({ message: "Email already exists" });
       }
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({ message: "Invalid user data" });
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid user data" });
       }
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: "Server error while creating user" });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while creating user" });
     });
 };
 
@@ -40,13 +46,17 @@ const getCurrentUser = (req, res) => {
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "User not found" });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       console.error(err);
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: "Server error while fetching current user" });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while fetching current user" });
     });
 };
 
@@ -58,16 +68,22 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(userId, { name, avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "User not found" });
       }
       return res.send(user);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({ message: "Invalid data provided" });
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid data provided" });
       }
-      return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: "Server error while updating user" });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error while updating user" });
     });
 };
 
@@ -75,14 +91,31 @@ const updateUser = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
+  // Check for required fields
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST_ERROR_CODE)
+      .send({ message: "Email and password are required" });
+  }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
       return res.send({ token });
     })
-    .catch(() =>
-      res.status(UNAUTHORIZED_ERROR_CODE).send({ message: "Incorrect email or password" })
-    );
+    .catch((err) => {
+      console.error(err);
+
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(UNAUTHORIZED_ERROR_CODE)
+          .send({ message: "Incorrect email or password" });
+      }
+
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "Server error during login" });
+    });
 };
 
 module.exports = {

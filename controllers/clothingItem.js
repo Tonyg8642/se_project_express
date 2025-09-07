@@ -4,6 +4,7 @@ const {
   INTERNAL_SERVER_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   BAD_REQUEST_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
 // Create a new clothing item
@@ -11,9 +12,9 @@ const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
   return ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => res.send({ data: item }))
+    .then((item) => res.status(201).send({ data: item }))
     .catch((e) => {
-      console.error(e); // log the error for debugging
+      console.error(e);
       if (e.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
@@ -21,7 +22,7 @@ const createItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from createItem" });
+        .send({ message: "Server error while creating item" });
     });
 };
 
@@ -33,28 +34,8 @@ const getItems = (req, res) =>
       console.error(e);
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from getItems" });
+        .send({ message: "Server error while fetching items" });
     });
-
-// Update a clothing item's image
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  return ClothingItem.findByIdAndUpdate(
-    itemId,
-    { $set: { imageUrl } },
-    { new: true }
-  )
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from updateItem", e });
-    });
-};
 
 // Delete a clothing item (only if owner matches current user)
 const deleteItem = (req, res) => {
@@ -64,16 +45,11 @@ const deleteItem = (req, res) => {
   return ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      if (!item) {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item Not Found" });
-      }
-
+      // Ownership check
       if (item.owner.toString() !== currentUserId) {
         return res
-        .status(FORBIDDEN_ERROR_CODE)
-          .send({ message: "Forbidden: You cannot delete another user's item" });
+          .status(FORBIDDEN_ERROR_CODE)
+          .send({ message: "You cannot delete another user's item" });
       }
 
       return item.deleteOne().then(() =>
@@ -85,7 +61,7 @@ const deleteItem = (req, res) => {
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item Not Found" });
+          .send({ message: "Item not found" });
       }
       if (e.name === "CastError") {
         return res
@@ -94,7 +70,7 @@ const deleteItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from deleteItem" });
+        .send({ message: "Server error while deleting item" });
     });
 };
 
@@ -115,7 +91,7 @@ const likeItem = (req, res) => {
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item Not Found" });
+          .send({ message: "Item not found" });
       }
       if (e.name === "CastError") {
         return res
@@ -124,7 +100,7 @@ const likeItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from likeItem" });
+        .send({ message: "Server error while liking item" });
     });
 };
 
@@ -145,7 +121,7 @@ const unlikeItem = (req, res) => {
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item Not Found" });
+          .send({ message: "Item not found" });
       }
       if (e.name === "CastError") {
         return res
@@ -154,14 +130,13 @@ const unlikeItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Error from unlikeItem" });
+        .send({ message: "Server error while unliking item" });
     });
 };
 
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   unlikeItem,
