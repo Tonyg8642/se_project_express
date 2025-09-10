@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("./routes");
+const { INTERNAL_SERVER_ERROR_CODE } = require("./utils/errors"); // ✅ import constant
 
 const app = express();
 const PORT = 3001;
@@ -16,9 +17,11 @@ app.use(express.json());
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
+    // eslint-disable-next-line no-console
     console.log("Connected to MongoDB");
   })
   .catch((err) => {
+    // eslint-disable-next-line no-console
     console.error("Error connecting to MongoDB:", err);
   });
 
@@ -31,14 +34,16 @@ app.get("/", (req, res) =>
 );
 
 // Global error handler (good practice)
-app.use((err, req, res, next) => {
+app.use((err, req, res,) => {
+  // eslint-disable-next-line no-console
   console.error(err.stack);
   res
-    .status(500)
+    .status(INTERNAL_SERVER_ERROR_CODE) // ✅ use constant instead of 500
     .send({ message: "An error has occurred on the server" });
 });
 
 // Start server
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server is listening on port ${PORT}`);
 });

@@ -52,9 +52,11 @@ const deleteItem = (req, res) => {
           .send({ message: "You cannot delete another user's item" });
       }
 
-      return item.deleteOne().then(() =>
-        res.status(200).send({ message: "Item deleted successfully" })
-      );
+      return item
+        .deleteOne()
+        .then(() =>
+          res.status(200).send({ message: "Item deleted successfully" })
+        );
     })
     .catch((e) => {
       console.error(e);
@@ -115,19 +117,22 @@ const unlikeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((e) => {
       console.error(e);
+
       if (e.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
       }
+
       if (e.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
+
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while unliking item" });

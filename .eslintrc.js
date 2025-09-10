@@ -3,7 +3,6 @@ module.exports = {
     es2021: true,
     node: true,
   },
-
   extends: ["eslint:recommended", "airbnb-base", "prettier"],
   overrides: [
     {
@@ -18,9 +17,10 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: "latest",
-    sourceType: "module",
+    sourceType: "script", // use "module" only if your package.json has "type": "module"
   },
   rules: {
     "no-underscore-dangle": "off",
+    "no-console": ["warn", { allow: ["warn", "error"] }], // instead of error, so you see warnings but build doesn’t fail
   },
 };
