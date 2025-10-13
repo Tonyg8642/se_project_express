@@ -13,7 +13,8 @@ const { JWT_SECRET } = require("../utils/config");
 // Create a new user (signup)
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-
+  // check that name , avatar, email password are not null
+  // throw error
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))

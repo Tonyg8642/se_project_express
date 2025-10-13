@@ -5,11 +5,12 @@ const clothingItemRoutes = require("./clothingItem");
 const userRoutes = require("./users");
 const auth = require("../middlewares/auth");
 const { NOT_FOUND_ERROR_CODE } = require("../utils/errors"); // ✅ import constant
+const {getItems} = require("../controllers/clothingItem")
 
 // Public routes
 router.post("/signin", login);
 router.post("/signup", createUser);
-router.get("/items", clothingItemRoutes); // only GET is public
+router.get("/items", getItems); // only GET is public
 
 // Protected routes
 router.use(auth);
