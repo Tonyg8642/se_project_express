@@ -11,7 +11,7 @@ const clothingItemSchema = new mongoose.Schema({
   weather: {
     type: String,
     required: true,
-    enum: ['hot', 'warm', 'cold'], // An enum validator limits values to a specific list
+    enum: ["hot", "warm", "cold"], // An enum validator limits values to a specific list
   },
   imageUrl: {
     type: String,
@@ -23,7 +23,7 @@ const clothingItemSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", 
+    ref: "User",
     required: true,
   },
   likes: {
@@ -38,3 +38,6 @@ const clothingItemSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("ClothingItem", clothingItemSchema);
+
+
+

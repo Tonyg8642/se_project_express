@@ -13,16 +13,12 @@ module.exports = (req, res, next) => {
 
   const token = authorization.replace("Bearer ", "");
 
-  let payload;
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    req.user = jwt.verify(token, JWT_SECRET);
+    return next();
   } catch (err) {
     return res
       .status(UNAUTHORIZED_ERROR_CODE)
       .send({ message: "Invalid or expired token" });
   }
-
-  req.user = payload;
-
-  return next();
 };
