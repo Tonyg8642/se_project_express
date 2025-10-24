@@ -1,11 +1,12 @@
-// routes/users.js
-const router = require("express").Router();
+// 📁 routes/users.js
+
+const express = require("express");
 const { getCurrentUser, updateUser } = require("../controllers/user");
 
-// GET /users/me → return the logged-in user
-router.get("/me", getCurrentUser);
+const router = express.Router();
 
-// PATCH /users/me → update name & avatar
-router.patch("/me", updateUser);
+// ---------- PROTECTED ROUTES (require JWT token) ----------
+router.get("/me", getCurrentUser); // get current logged-in user
+router.patch("/me", updateUser); // update user profile (name/avatar)
 
 module.exports = router;

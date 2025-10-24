@@ -1,5 +1,7 @@
+// 📦 Import the ClothingItem Mongoose model
 const ClothingItem = require("../models/clothingItem");
 
+// 📦 Import reusable HTTP error codes
 const {
   INTERNAL_SERVER_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
@@ -7,15 +9,18 @@ const {
   FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
-// Create a new clothing item
+/**
+ * 🧩 Create a new clothing item
+ * Only works for logged-in users (owner = req.user._id)
+ */
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  return ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.status(201).send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === "ValidationError") {
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item data" });
@@ -26,46 +31,54 @@ const createItem = (req, res) => {
     });
 };
 
-// Get all clothing items
-const getItems = (req, res) =>
+/**
+ * 🧩 Get all clothing items
+ * Public route — returns all documents in the collection
+ */
+const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.send(items))
-    .catch((e) => {
-      console.error(e);
+    .then((items) => res.status(200).send(items))
+    .catch((err) => {
+      console.error(err);
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while fetching items" });
     });
+};
 
-// Delete a clothing item (only if owner matches current user)
+/**
+ * 🧩 Delete a clothing item
+ * User can only delete items they own
+ */
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   const currentUserId = req.user._id;
 
-  return ClothingItem.findById(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      // Ownership check
+      // 🚫 Ownership check
       if (item.owner.toString() !== currentUserId) {
         return res
           .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "You cannot delete another user's item" });
       }
 
+      // ✅ Delete if owner matches
       return item
         .deleteOne()
         .then(() =>
           res.status(200).send({ message: "Item deleted successfully" })
         );
     })
-    .catch((e) => {
-      console.error(e);
-      if (e.name === "DocumentNotFoundError") {
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
       }
-      if (e.name === "CastError") {
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
@@ -76,26 +89,29 @@ const deleteItem = (req, res) => {
     });
 };
 
-// Like a clothing item
+/**
+ * 🧩 Like a clothing item
+ * Adds user ID to the item's likes array
+ */
 const likeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  return ClothingItem.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     itemId,
-    { $addToSet: { likes: userId } },
+    { $addToSet: { likes: userId } }, // avoids duplicates
     { new: true }
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-      if (e.name === "DocumentNotFoundError") {
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
       }
-      if (e.name === "CastError") {
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
@@ -106,39 +122,40 @@ const likeItem = (req, res) => {
     });
 };
 
-// Unlike a clothing item
+/**
+ * 🧩 Unlike a clothing item
+ * Removes user ID from the item's likes array
+ */
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  return ClothingItem.findByIdAndUpdate(
+  ClothingItem.findByIdAndUpdate(
     itemId,
     { $pull: { likes: userId } },
     { new: true }
   )
     .orFail()
-    .then((item) => res.send({ data: item }))
-    .catch((e) => {
-      console.error(e);
-
-      if (e.name === "DocumentNotFoundError") {
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "Item not found" });
       }
-
-      if (e.name === "CastError") {
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item ID" });
       }
-
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while unliking item" });
     });
 };
 
+// 🧩 Export all controllers
 module.exports = {
   createItem,
   getItems,

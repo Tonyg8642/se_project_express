@@ -1,5 +1,6 @@
-const router = require("express").Router();
-const auth = require("../middlewares/auth");
+// 📁 routes/clothingItems.js
+
+const express = require("express");
 const {
   createItem,
   getItems,
@@ -7,15 +8,28 @@ const {
   likeItem,
   unlikeItem,
 } = require("../controllers/clothingItem");
+const auth = require("../middlewares/auth");
 
-// Public route (no auth required)
+const router = express.Router();
+
+// ---------- PUBLIC ROUTE ----------
+// View all clothing items (no auth required)
 router.get("/", getItems);
 
-// Protected routes
-router.post("/", auth, createItem);
-router.delete("/:itemId", auth, deleteItem);
-router.put("/:itemId/likes", auth, likeItem);
-router.delete("/:itemId/likes", auth, unlikeItem);
+// ---------- PROTECTED ROUTES ----------
+// Everything below requires a valid JWT
+router.use(auth);
+
+// Add a new clothing item
+router.post("/", createItem);
+
+// Delete a clothing item by ID
+router.delete("/:itemId", deleteItem);
+
+// Like a clothing item
+router.put("/:itemId/likes", likeItem);
+
+// Unlike a clothing item
+router.delete("/:itemId/likes", unlikeItem);
 
 module.exports = router;
-

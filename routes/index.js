@@ -1,28 +1,32 @@
 // 📁 routes/index.js
-const router = require("express").Router();
-const { login, createUser } = require("../controllers/user");
-const clothingItemRoutes = require("./clothingItem");
+
+const express = require("express");
+const { login, createUser } = require("../controllers/user"); // ✅ corrected filename
+const clothingItemRoutes = require("./clothingItem"); // ✅ plural route file
 const userRoutes = require("./users");
 const auth = require("../middlewares/auth");
 const { NOT_FOUND_ERROR_CODE } = require("../utils/errors");
-const { getItems } = require("../controllers/clothingItem");
+
+const router = express.Router();
 
 // ---------- PUBLIC ROUTES ----------
-// These can be accessed without a token
-router.post("/signin", login);       // Login → returns JWT token
-router.post("/signup", createUser);  // Register → creates new user
-router.get("/items", getItems);      // View all clothing items (no auth required)
+// No token required
+router.post("/signin", login); // Log in → returns JWT
+router.post("/signup", createUser); // Register → creates new user
+router.use("/items", clothingItemRoutes); // Allow public GET /items
 
 // ---------- PROTECTED ROUTES ----------
-// All routes below this middleware require a valid JWT
+// Everything below this requires valid JWT
 router.use(auth);
 
-router.use("/users", userRoutes);    // GET /users/me, PATCH /users/me, etc.
+router.use("/users", userRoutes); // GET /users/me, PATCH /users/me
 router.use("/items", clothingItemRoutes); // POST /items, DELETE, like/unlike
 
 // ---------- 404 HANDLER ----------
 router.use((req, res) => {
-  res.status(NOT_FOUND_ERROR_CODE).send({ message: "Not Found" });
+  res
+    .status(NOT_FOUND_ERROR_CODE)
+    .send({ message: "Requested resource not found" });
 });
 
 module.exports = router;
