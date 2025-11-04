@@ -5,8 +5,9 @@ const clothingItemRoutes = require("./clothingItem"); // ✅ plural route file
 const userRoutes = require("./users");
 const auth = require("../middlewares/auth");
 const { NOT_FOUND_ERROR_CODE } = require("../utils/errors");
+const router = require("express").Router();
 
-const router = express.Router();
+
 
 // ---------- PUBLIC ROUTES ----------
 // No token required
