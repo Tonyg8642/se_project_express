@@ -1,6 +1,5 @@
 // 📁 routes/index.js
 
-const express = require("express");
 const { login, createUser } = require("../controllers/user"); // ✅ corrected filename
 const clothingItemRoutes = require("./clothingItem"); // ✅ plural route file
 const userRoutes = require("./users");
