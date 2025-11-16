@@ -31,6 +31,10 @@ const createItem = (req, res) => {
     });
 };
 
+//ClothingItem.create({name, weather, imageUrl, owner: req.user._id})
+//.then((item) => res.status.(201).send({data:item}))
+//.cat
+
 /**
  * 🧩 Get all clothing items
  * Public route — returns all documents in the collection
