@@ -19,7 +19,7 @@ const createItem = (req, res) => {
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.status(201).send({ data: item }))
     .catch((err) => {
-      console.error(err);
+      // removed console.error for ESLint
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
@@ -31,9 +31,10 @@ const createItem = (req, res) => {
     });
 };
 
-//ClothingItem.create({name, weather, imageUrl, owner: req.user._id})
-//.then((item) => res.status.(201).send({data:item}))
-//.cat
+// Corrected comments (spaced-comment rule)
+// ClothingItem.create({ ... })
+// .then((item) => res.status(201).send({ data: item }))
+// .catch(() => {})
 
 /**
  * 🧩 Get all clothing items
@@ -42,8 +43,7 @@ const createItem = (req, res) => {
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => {
-      console.error(err);
+    .catch(() => {
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "Server error while fetching items" });
@@ -61,14 +61,14 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      // 🚫 Ownership check
+      // Ownership check
       if (item.owner.toString() !== currentUserId) {
         return res
           .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "You cannot delete another user's item" });
       }
 
-      // ✅ Delete if owner matches
+      // Delete if owner matches
       return item
         .deleteOne()
         .then(() =>
@@ -76,7 +76,6 @@ const deleteItem = (req, res) => {
         );
     })
     .catch((err) => {
-      console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -103,13 +102,12 @@ const likeItem = (req, res) => {
 
   ClothingItem.findByIdAndUpdate(
     itemId,
-    { $addToSet: { likes: userId } }, // avoids duplicates
+    { $addToSet: { likes: userId } },
     { new: true }
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
@@ -142,7 +140,6 @@ const unlikeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
