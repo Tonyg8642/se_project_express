@@ -1,35 +1,34 @@
 // 📁 routes/clothingItems.js
 
 const express = require("express");
+
+// Import controllers
 const {
-  createItem,
   getItems,
+  createItem,
   deleteItem,
   likeItem,
   unlikeItem,
-} = require("../controllers/clothingItem");
-const auth = require("../middlewares/auth");
+} = require("../controllers/clothingItem"); // <-- corrected filename
+
+// Import validation middleware
+const { validateCardBody, validateId } = require("../middlewares/validation");
 
 const router = express.Router();
 
-// ---------- PUBLIC ROUTE ----------
-// View all clothing items (no auth required)
+// GET all items
 router.get("/", getItems);
 
-// ---------- PROTECTED ROUTES ----------
-// Everything below requires a valid JWT
-router.use(auth);
+// Create item
+router.post("/", validateCardBody, createItem);
 
-// Add a new clothing item
-router.post("/", createItem);
+// Delete item
+router.delete("/:itemId", validateId, deleteItem); // <-- corrected param name
 
-// Delete a clothing item by ID
-router.delete("/:itemId", deleteItem);
+// Like item
+router.put("/:itemId/likes", validateId, likeItem); // <-- corrected param name
 
-// Like a clothing item
-router.put("/:itemId/likes", likeItem);
-
-// Unlike a clothing item
-router.delete("/:itemId/likes", unlikeItem);
+// Unlike item
+router.delete("/:itemId/likes", validateId, unlikeItem); // <-- corrected param name
 
 module.exports = router;

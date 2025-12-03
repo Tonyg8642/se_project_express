@@ -17,10 +17,14 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: "latest",
-    sourceType: "script", // use "module" only if your package.json has "type": "module"
+    sourceType: "script",
   },
   rules: {
     "no-underscore-dangle": "off",
-    "no-console": ["warn", { allow: ["warn", "error"] }], // instead of error, so you see warnings but build doesn’t fail
+
+    "no-console": ["warn", { allow: ["warn", "error"] }],
+
+    // ✅ This allows Express error handlers to include 'next'
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
   },
 };

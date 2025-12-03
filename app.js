@@ -3,34 +3,57 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const routes = require("./routes"); // imports index.js inside /routes
-const { INTERNAL_SERVER_ERROR_CODE } = require("./utils/errors");
+
+// ⭐ Import loggers
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+
+// Import your routes
+const routes = require("./routes");
+
+// Import centralized error handler
+const errorHandler = require("./middlewares/error-handler");
+
+// ⭐ Celebrate validation errors middleware
+const { errors } = require("celebrate");
 
 const app = express();
 const PORT = 3001;
 
-// ---------- MIDDLEWARE ----------
+// ---------------------------
+// 🔧 MIDDLEWARE
+// ---------------------------
 app.use(cors());
 app.use(express.json());
 
-// ---------- DATABASE CONNECTION ----------
-mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .catch(() => {}); // removed console logs to satisfy no-console
+// ⭐ Log all incoming requests BEFORE routes
+app.use(requestLogger);
 
-// ---------- ROUTES ----------
+// ---------------------------
+// 🗄 DATABASE CONNECTION
+// ---------------------------
+mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db").catch(() => {});
+
+// ---------------------------
+// 🚦 ROUTES
+// ---------------------------
 app.use("/", routes);
 
-// ---------- DEFAULT TEST ROUTE ----------
-app.get("/", (req, res) => res.send({ message: "Server running on port 3001" }));
+// ---------------------------
+// ⭐ Log errors AFTER routes
+// ---------------------------
+app.use(errorLogger);
 
-// ---------- GLOBAL ERROR HANDLER ----------
-app.use((err, req, res, _next) => {
-  // removed console.error for ESLint
-  res
-    .status(INTERNAL_SERVER_ERROR_CODE)
-    .send({ message: "An error occurred on the server" });
-});
+// ---------------------------
+// ⚠️ CELEBRATE ERROR HANDLER
+// ---------------------------
+app.use(errors());
 
-// ---------- SERVER LISTEN ----------
+// ---------------------------
+// 🛑 CENTRALIZED ERROR HANDLER
+// ---------------------------
+app.use(errorHandler);
+
+// ---------------------------
+// 🖥 SERVER LISTEN
+// ---------------------------
 app.listen(PORT, () => {});
