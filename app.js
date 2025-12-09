@@ -1,59 +1,35 @@
-// 📁 app.js
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
-// ⭐ Import loggers
-const { requestLogger, errorLogger } = require("./middlewares/logger");
-
-// Import your routes
 const routes = require("./routes");
-
-// Import centralized error handler
-const errorHandler = require("./middlewares/error-handler");
-
-// ⭐ Celebrate validation errors middleware
-const { errors } = require("celebrate");
+const { INTERNAL_SERVER_ERROR_CODE } = require("./utils/errors");
 
 const app = express();
 const PORT = 3001;
 
-// ---------------------------
-// 🔧 MIDDLEWARE
-// ---------------------------
+// ---------- MIDDLEWARE ----------
 app.use(cors());
 app.use(express.json());
 
-// ⭐ Log all incoming requests BEFORE routes
-app.use(requestLogger);
+// ---------- DATABASE CONNECTION ----------
+mongoose
+  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .catch(() => {}); 
 
-// ---------------------------
-// 🗄 DATABASE CONNECTION
-// ---------------------------
-mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db").catch(() => {});
-
-// ---------------------------
-// 🚦 ROUTES
-// ---------------------------
+// ---------- ROUTES ----------
 app.use("/", routes);
 
-// ---------------------------
-// ⭐ Log errors AFTER routes
-// ---------------------------
-app.use(errorLogger);
+// ---------- DEFAULT TEST ROUTE ----------
+app.get("/", (req, res) => res.send({ message: "Server running on port 3001" }));
 
-// ---------------------------
-// ⚠️ CELEBRATE ERROR HANDLER
-// ---------------------------
-app.use(errors());
+// ---------- GLOBAL ERROR HANDLER ----------
+app.use((err, req, res, _next) => {
+  res
+    .status(INTERNAL_SERVER_ERROR_CODE)
+    .send({ message: "An error occurred on the server" });
+});
 
-// ---------------------------
-// 🛑 CENTRALIZED ERROR HANDLER
-// ---------------------------
-app.use(errorHandler);
-
-// ---------------------------
-// 🖥 SERVER LISTEN
-// ---------------------------
-app.listen(PORT, () => {});
+// ---------- SERVER LISTEN ----------
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});

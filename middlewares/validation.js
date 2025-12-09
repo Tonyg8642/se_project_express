@@ -34,6 +34,8 @@ module.exports.validateCardBody = celebrate({
   }),
 });
 
+//add weather property
+
 // --------------------------------------------------------
 // 2️⃣ VALIDATE USER BODY (SIGN UP)
 // --------------------------------------------------------
