@@ -15,7 +15,7 @@ Repository links:
       
 - **Deployed:** [wtwr Deployed BackEnd](https://api.wtwr12.mooo.com)
 
-- **Deployed:** [wtwr Deployed FrontEnd](wtwr12.mooo.com)
+- **Deployed:** [wtwr Deployed FrontEnd](https://wtwr12.mooo.com)
 
-- **Deployed:** [wtwr Deployed FrontEnd](www.wtwr12.mooo.com)
+- **Deployed:** [wtwr Deployed FrontEnd](https://www.wtwr12.mooo.com)
     
