@@ -16,9 +16,6 @@ const { validateCardBody, validateId } = require("../middlewares/validation");
 
 const router = express.Router();
 
-// GET all items
-router.get("/", getItems);
-
 // Create item
 router.post("/", validateCardBody, createItem);
 

@@ -1,35 +1,29 @@
 // 📁 routes/index.js
 
-// ⭐ EXPRESS MUST BE FIRST (ESLint: import/order)
 const router = require("express").Router();
 
-// ⭐ Controller imports
+// Controllers
 const { login, createUser } = require("../controllers/user");
+const { getItems } = require("../controllers/clothingItem");
 
-// ⭐ Route files
+// Routes
 const clothingItemRoutes = require("./clothingItem");
 const userRoutes = require("./users");
 
-// ⭐ Middlewares & utilities
+// Middlewares
 const auth = require("../middlewares/auth");
 const { NotFoundError } = require("../utils/errors");
 
-// ---------- PUBLIC ROUTES ----------
-// No token required
-router.post("/signin", login);         // Log in → returns JWT
-router.post("/signup", createUser);    // Register new user
+// ---------- PUBLIC ROUTES (NO TOKEN) ----------
+router.post("/signin", login); // Login
+router.post("/signup", createUser); // Register
+router.get("/items", getItems);
 
-// Public GET /items route (no auth)
-router.use("/items", clothingItemRoutes);
+// ---------- PROTECTED ROUTES (TOKEN REQUIRED) ----------
+router.use(auth); // Everything below this line requires JWT
 
-// ---------- PROTECTED ROUTES ----------
-// Everything below this requires a valid JWT
-router.use(auth);
-
-router.use("/users", userRoutes);      // GET /users/me, PATCH /users/me
-
-// Protected item routes (POST, DELETE, likes)
-router.use("/items", clothingItemRoutes);
+router.use("/users", userRoutes); // /users/me, PATCH /users/me
+router.use("/items", clothingItemRoutes); // POST, DELETE, LIKE, UNLIKE
 
 // ---------- 404 HANDLER ----------
 router.use((req, res, next) => {

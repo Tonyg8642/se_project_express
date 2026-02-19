@@ -1,22 +1,21 @@
-// 📦 Import the ClothingItem Mongoose model
 const ClothingItem = require("../models/clothingItem");
 
-// 📦 Import only the custom errors ACTUALLY USED here
 const {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } = require("../utils/errors");
 
-/**
- * 🧩 Create a new clothing item
- * Only works for logged-in users (owner = req.user._id)
- */
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => res.status(201).send({ data: item }))
+  ClothingItem.create({
+    name,
+    weather,
+    imageUrl,
+    owner: req.user._id,
+  })
+    .then((item) => res.status(201).send(item)) // ✅ send item directly
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid item data"));
@@ -25,20 +24,12 @@ const createItem = (req, res, next) => {
     });
 };
 
-/**
- * 🧩 Get all clothing items
- * Public route — returns all documents in the collection
- */
 const getItems = (req, res, next) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(200).send(items)) // ✅ already correct
     .catch(next);
 };
 
-/**
- * 🧩 Delete a clothing item
- * User can only delete items they own
- */
 const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const currentUserId = req.user._id;
@@ -62,10 +53,7 @@ const deleteItem = (req, res, next) => {
     });
 };
 
-/**
- * 🧩 Like a clothing item
- * Adds user ID to the item's likes array
- */
+
 const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
@@ -76,7 +64,7 @@ const likeItem = (req, res, next) => {
     { new: true }
   )
     .orFail(() => new NotFoundError("Item not found"))
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.status(200).send(item)) // ✅ fixed
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID"));
@@ -85,10 +73,6 @@ const likeItem = (req, res, next) => {
     });
 };
 
-/**
- * 🧩 Unlike a clothing item
- * Removes user ID from the item's likes array
- */
 const unlikeItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
@@ -99,7 +83,7 @@ const unlikeItem = (req, res, next) => {
     { new: true }
   )
     .orFail(() => new NotFoundError("Item not found"))
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.status(200).send(item)) // ✅ fixed
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID"));
@@ -108,7 +92,6 @@ const unlikeItem = (req, res, next) => {
     });
 };
 
-// 🧩 Export all controllers
 module.exports = {
   createItem,
   getItems,
