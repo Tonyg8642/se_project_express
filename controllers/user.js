@@ -1,10 +1,9 @@
-// 📁 controllers/users.js
+// 📁 controllers/user.js
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// ⭐ Import ONLY the custom errors USED in this file
 const {
   BadRequestError,
   UnauthorizedError,
@@ -18,14 +17,13 @@ const { JWT_SECRET } = require("../utils/config");
 const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
-  // Validate required fields
   if (!name || !avatar || !email || !password) {
     return next(
       new BadRequestError("All fields (name, avatar, email, password) are required")
     );
   }
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
@@ -37,35 +35,37 @@ const createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(new ConflictError("Email already exists"));
       }
-
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid user data"));
       }
-
       return next(err);
     });
 };
 
 // ---------- GET CURRENT LOGGED-IN USER ----------
 const getCurrentUser = (req, res, next) => {
-  const userId = req.user._id;
+  const { _id: userId } = req.user;
 
-  User.findById(userId)
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError("User not found"));
       }
       return res.send(user);
     })
-    .catch(next);
+    .catch((err) => next(err));
 };
 
 // ---------- UPDATE USER PROFILE ----------
 const updateUser = (req, res, next) => {
   const { name, avatar } = req.body;
-  const userId = req.user._id;
+  const { _id: userId } = req.user;
 
-  User.findByIdAndUpdate(userId, { name, avatar }, { new: true, runValidators: true })
+  return User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
     .then((user) => {
       if (!user) {
         return next(new NotFoundError("User not found"));
@@ -88,12 +88,13 @@ const login = (req, res, next) => {
     return next(new BadRequestError("Email and password are required"));
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
       return res.send({ token });
     })
     .catch((err) => {
+      // Depending on how your model throws, support either pattern:
       if (err.message === "Incorrect email or password") {
         return next(new UnauthorizedError("Incorrect email or password"));
       }
@@ -101,7 +102,6 @@ const login = (req, res, next) => {
     });
 };
 
-// ---------- EXPORTS ----------
 module.exports = {
   createUser,
   getCurrentUser,

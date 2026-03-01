@@ -1,10 +1,13 @@
 require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { errors } = require("celebrate"); // ✅ celebrate errors middleware
 
 const routes = require("./routes");
 const errorHandler = require("./middlewares/error-handler");
+const { requestLogger, errorLogger } = require("./middlewares/logger"); // ✅ winston loggers
 
 const app = express();
 const PORT = 3001;
@@ -12,6 +15,9 @@ const PORT = 3001;
 // ---------- MIDDLEWARE ----------
 app.use(cors());
 app.use(express.json());
+
+// ✅ LOG EVERY REQUEST (must be BEFORE routes)
+app.use(requestLogger);
 
 // ---------- DATABASE CONNECTION ----------
 mongoose
@@ -29,10 +35,11 @@ app.get("/crash-test", () => {
 // ---------- ROUTES ----------
 app.use("/", routes);
 
-// ---------- DEFAULT TEST ROUTE ----------
-app.get("/", (req, res) => {
-  res.send({ message: "Server running on port 3001" });
-});
+// ✅ HANDLE celebrate VALIDATION ERRORS (must be AFTER routes)
+app.use(errors());
+
+// ✅ LOG ERRORS (must be BEFORE your custom error handler)
+app.use(errorLogger);
 
 // ---------- GLOBAL ERROR HANDLER (MUST BE LAST) ----------
 app.use(errorHandler);
