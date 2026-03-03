@@ -1,115 +1,54 @@
-// 📁 middlewares/validation.js
-
-// Import Joi (for validation) and celebrate (so Joi works as middleware)
-const { Joi, celebrate } = require("celebrate");
-
-// Import validator library for strict URL checking
+const { celebrate, Joi } = require("celebrate");
 const validator = require("validator");
 
-// ----------------------------------
-//  CUSTOM URL VALIDATOR FUNCTION
-// ----------------------------------
 const validateURL = (value, helpers) => {
-  if (validator.isURL(value)) {
-    return value; // URL is valid → return it as-is
+  if (!validator.isURL(value)) {
+    return helpers.message("Invalid URL");
   }
-  return helpers.error("string.uri"); // invalid → throw URI error
+  return value;
 };
 
-// --------------------------------------------------------
-// 1️⃣ VALIDATE CLOTHING ITEM BODY (CREATE ITEM)
-// --------------------------------------------------------
-module.exports.validateCardBody = celebrate({
+const validateSignup = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30).messages({
-      "string.min": 'The minimum length of the "name" field is 2',
-      "string.max": 'The maximum length of the "name" field is 30',
-      "string.empty": 'The "name" field must be filled in',
-    }),
-
-    imageUrl: Joi.string().required().custom(validateURL).messages({
-      "string.empty": 'The "imageUrl" field must be filled in',
-      "string.uri": 'The "imageUrl" field must be a valid url',
-    }),
-
-    weather: Joi.string().valid("hot", "warm", "cold").required().messages({
-      "any.only": 'The "weather" field must be one of: hot, warm, cold',
-      "string.empty": 'The "weather" field must be filled in',
-    }),
+    name: Joi.string().min(2).max(30).required(),
+    avatar: Joi.string().required().custom(validateURL),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
 });
 
-
-
-// --------------------------------------------------------
-// 2️⃣ VALIDATE USER BODY (SIGN UP)
-// --------------------------------------------------------
-module.exports.validateUserBody = celebrate({
+const validateSignin = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).messages({
-      "string.min": 'The minimum length of the "name" field is 2',
-      "string.max": 'The maximum length of the "name" field is 30',
-    }),
-
-    avatar: Joi.string().required().custom(validateURL).messages({
-      "string.empty": 'The "avatar" field must be filled in',
-      "string.uri": 'The "avatar" field must be a valid url',
-    }),
-
-    email: Joi.string().required().email().messages({
-      "string.empty": 'The "email" field must be filled in',
-      "string.email": 'The "email" field must be a valid email',
-    }),
-
-    password: Joi.string().required().messages({
-      "string.empty": 'The "password" field must be filled in',
-    }),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
   }),
 });
 
-// --------------------------------------------------------
-// 3️⃣ VALIDATE LOGIN BODY
-// --------------------------------------------------------
-module.exports.validateLogin = celebrate({
+const validateCreateItem = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().messages({
-      "string.empty": 'The "email" field must be filled in',
-      "string.email": 'The "email" field must be a valid email',
-    }),
-
-    password: Joi.string().required().messages({
-      "string.empty": 'The "password" field must be filled in',
-    }),
+    name: Joi.string().required().min(2).max(30),
+    weather: Joi.string().required().valid("hot", "warm", "cold"),
+    imageUrl: Joi.string().required().custom(validateURL),
   }),
 });
 
-// --------------------------------------------------------
-// 4️⃣ VALIDATE ANY ID PARAM (userId, itemId, etc.)
-// MUST MATCH route params EXACTLY
-// --------------------------------------------------------
-module.exports.validateId = celebrate({
+const validateItemId = celebrate({
   params: Joi.object().keys({
-    itemId: Joi.string().required().hex().length(24).messages({
-      "string.length": "ID must be 24 characters long",
-      "string.hex": "ID must be a valid hexadecimal value",
-      "string.empty": "ID parameter is required",
-    }),
+    itemId: Joi.string().hex().length(24).required(),
   }),
 });
 
-// --------------------------------------------------------
-// 5️⃣ VALIDATE USER UPDATE (PATCH /users/me)
-// --------------------------------------------------------
-module.exports.validateUserUpdate = celebrate({
+const validateUpdateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).messages({
-      "string.min": 'The minimum length of the "name" field is 2',
-      "string.max": 'The maximum length of the "name" field is 30',
-    }),
-
-    avatar: Joi.string().required().custom(validateURL).messages({
-      "string.empty": 'The "avatar" field must be filled in',
-      "string.uri": 'The "avatar" field must be a valid url',
-    }),
+    name: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(validateURL),
   }),
 });
+
+module.exports = {
+  validateSignup,
+  validateSignin,
+  validateCreateItem,
+  validateItemId,
+  validateUpdateUser,
+};
