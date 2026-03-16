@@ -1,54 +1,57 @@
 const { celebrate, Joi } = require("celebrate");
-const validator = require("validator");
 
-const validateURL = (value, helpers) => {
-  if (!validator.isURL(value)) {
-    return helpers.message("Invalid URL");
-  }
-  return value;
-};
+// ---------- AUTH VALIDATION ----------
 
+// Signup: name, avatar, email, password
 const validateSignup = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    avatar: Joi.string().required().custom(validateURL),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    avatar: Joi.string().uri().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
   }),
 });
 
+// Signin: email, password
 const validateSignin = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
 });
 
-const validateCreateItem = celebrate({
+// ---------- USER VALIDATION ----------
+
+// Update user: name, avatar
+const validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    weather: Joi.string().required().valid("hot", "warm", "cold"),
-    imageUrl: Joi.string().required().custom(validateURL),
+    name: Joi.string().min(2).max(30).required(),
+    avatar: Joi.string().uri().required(),
   }),
 });
 
-const validateItemId = celebrate({
+// ---------- ITEM VALIDATION ----------
+
+// Create item: name, imageUrl, weather
+const validateCardBody = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    imageUrl: Joi.string().uri().required(),
+    weather: Joi.string().valid("hot", "warm", "cold").required(),
+  }),
+});
+
+// Validate :itemId in routes
+const validateId = celebrate({
   params: Joi.object().keys({
     itemId: Joi.string().hex().length(24).required(),
-  }),
-});
-
-const validateUpdateUser = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validateURL),
   }),
 });
 
 module.exports = {
   validateSignup,
   validateSignin,
-  validateCreateItem,
-  validateItemId,
-  validateUpdateUser,
+  validateUserUpdate,
+  validateCardBody,
+  validateId,
 };
